@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.mariettemalherbe.co.za)",
+      "Bash(start \"\" \"C:\\\\Projects\\\\Mariette\\\\index.html\")",
+      "Bash(python -m http.server:*)",
+      "Bash(timeout:*)",
+      "Bash(curl:*)"
+    ]
+  }
+}
