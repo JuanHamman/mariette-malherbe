@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Contact Form ---
     const contactForm = document.getElementById('contactForm');
     if (contactForm) {
-        contactForm.addEventListener('submit', (e) => {
+        contactForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const formData = new FormData(contactForm);
@@ -283,27 +283,46 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // In production, this would submit to a backend/form service
             const submitBtn = contactForm.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = `
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                    <polyline points="22 4 12 14.01 9 11.01"/>
-                </svg>
-                Message Sent!
-            `;
-            submitBtn.disabled = true;
-            submitBtn.style.background = '#10b981';
-            submitBtn.style.borderColor = '#10b981';
+            
+            try {
+                // Submit to Formspree
+                const response = await fetch(contactForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
 
-            setTimeout(() => {
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-                submitBtn.style.background = '';
-                submitBtn.style.borderColor = '';
-                contactForm.reset();
-            }, 3000);
+                if (response.ok) {
+                    // Show success message
+                    submitBtn.innerHTML = `
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                        Message Sent!
+                    `;
+                    submitBtn.disabled = true;
+                    submitBtn.style.background = '#10b981';
+                    submitBtn.style.borderColor = '#10b981';
+
+                    setTimeout(() => {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                        submitBtn.style.background = '';
+                        submitBtn.style.borderColor = '';
+                        contactForm.reset();
+                    }, 3000);
+                } else {
+                    alert('There was an error sending your message. Please try again.');
+                }
+            } catch (error) {
+                console.error('Form submission error:', error);
+                alert('There was an error sending your message. Please try again.');
+            }
         });
     }
 
